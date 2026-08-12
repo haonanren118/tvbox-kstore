@@ -23765,3 +23765,65 @@ Generated: download/1/tvbox/source.json (13 alive, 5 backup)
 JSON verified OK: 13 entries, notice 104 chars
 Done in 29.0s
 === END ===
+=== generate.py START ===
+Timestamp: 2026-08-12 07:06:41
+Python 3.11
+Loaded 5 custom sources from custom_sources.json
+Total sources: 18 (built-in: 13, custom: 5)
+Phase 1: China speed test for 18 sources...
+  [CHINA] 杰翔 -> N/A (API failed, will use fallback)
+  [CHINA] 王二小 -> N/A (API failed, will use fallback)
+  [CHINA] 肥猫2 -> N/A (API failed, will use fallback)
+  [CHINA] 肥猫3 -> N/A (API failed, will use fallback)
+  [CHINA] 盒子迷 -> N/A (API failed, will use fallback)
+  [CHINA] 寳盒 -> N/A (API failed, will use fallback)
+  [CHINA] 饭太硬1 -> N/A (API failed, will use fallback)
+  [CHINA] 饭太硬2 -> N/A (API failed, will use fallback)
+  [CHINA] 饭太硬3 -> N/A (API failed, will use fallback)
+  [CHINA] 饭太硬4 -> N/A (API failed, will use fallback)
+  [CHINA] 饭太硬5 -> N/A (API failed, will use fallback)
+  [CHINA] 饭太硬6 -> N/A (API failed, will use fallback)
+  [CHINA] 饭太硬江苏郑州 -> N/A (API failed, will use fallback)
+  [CHINA] 肥猫影视 -> N/A (API failed, will use fallback)
+  [CHINA] 肥猫4 -> N/A (API failed, will use fallback)
+  [CHINA] 肥猫5 -> N/A (API failed, will use fallback)
+  [CHINA] 牛二 -> N/A (API failed, will use fallback)
+  [CHINA] 驸马 -> N/A (API failed, will use fallback)
+China speed test done: 0/18 sources got CN latency
+Phase 2: HTTP connectivity check for 18 sources (0 already alive from CN)...
+  [FAIL] [HTTPError] 寳盒 -> 'https://gh-proxy.com/https://raw.githubusercontent.com/guot55/yg/main/pg/bh.json' (368ms)
+  [FAIL] [HTTPError] 肥猫3 -> 'https://6296.kstore.vip/fm.gif' (608ms)
+  [OK] [200] 饭太硬4 -> 'http://fty.xxooo.cf/tv' (721ms, 20307bytes)
+  [OK] [200] 杰翔 -> 'https://tv.菜妮丝.top' (796ms, 2592bytes)
+  [OK] [200] 王二小 -> 'http://tvbox.王二小放牛娃.top' (850ms, 3719bytes)
+  [OK] [200] 饭太硬1 -> 'http://www.饭太硬.cc/tv' (913ms, 15816bytes)
+  [OK] [200] 饭太硬5 -> 'http://fty.888484.xyz/tv' (557ms, 15816bytes)
+  [OK] [200] 盒子迷 -> 'https://盒子迷.top/禁止贩卖' (945ms, 44175bytes)
+  [OK] [200] 饭太硬3 -> 'http://www.饭太硬.art/tv' (1135ms, 20307bytes)
+  [OK] [200] 饭太硬6 -> 'http://fty.333232.xyz/tv' (741ms, 15816bytes)
+  [OK] [200] 牛二 -> 'https://9280.kstore.vip/wex.json' (640ms, 20663bytes)
+  [OK] [200] 肥猫影视 -> 'http://肥猫.net/' (964ms, 40846bytes)
+  [OK] [200] 饭太硬2 -> 'http://www.饭太硬.net/tv' (1807ms, 15816bytes)
+  [OK] [200] 肥猫5 -> 'http://肥猫.net/tv' (980ms, 40846bytes)
+  [OK] [200] 驸马 -> 'http://fmys.top/fmys.json' (1095ms, 45446bytes)
+  [FAIL] [HTTPError] 饭太硬江苏郑州 -> 'https://raw.atomgit.com/xxxooo/fan/blobs/cef5f441c422cffe4852e0fc8b102f9be6d2bb2b/in.bmp' (1857ms)
+  [FAIL] [URLError] 肥猫2 -> 'http://feimao.pro' (8033ms)
+  [FAIL] [TimeoutError] 肥猫4 -> 'http://hello.肥猫.net' (8341ms)
+Result: 13 alive (sorted by speed), 5 backup
+  #1 饭太硬5 -> 557ms(US-fallback)
+  #2 牛二 -> 640ms(US-fallback)
+  #3 饭太硬4 -> 721ms(US-fallback)
+  #4 饭太硬6 -> 741ms(US-fallback)
+  #5 杰翔 -> 796ms(US-fallback)
+  #6 王二小 -> 850ms(US-fallback)
+  #7 饭太硬1 -> 913ms(US-fallback)
+  #8 盒子迷 -> 945ms(US-fallback)
+  #9 肥猫影视 -> 964ms(US-fallback)
+  #10 肥猫5 -> 980ms(US-fallback)
+  #11 驸马 -> 1095ms(US-fallback)
+  #12 饭太硬3 -> 1135ms(US-fallback)
+  #13 饭太硬2 -> 1807ms(US-fallback)
+Generated: download/1/tvbox/source.json (13 alive, 5 backup)
+JSON verified OK: 13 entries, notice 104 chars
+Done in 26.7s
+=== END ===
