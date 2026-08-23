@@ -6,24 +6,16 @@
             "name": "饭太硬4"
         },
         {
-            "url": "https://9280.kstore.vip/wex.json",
-            "name": "牛二"
-        },
-        {
             "url": "http://fty.333232.xyz/tv",
             "name": "饭太硬6"
         },
         {
+            "url": "https://9280.kstore.vip/wex.json",
+            "name": "牛二"
+        },
+        {
             "url": "http://fty.888484.xyz/tv",
             "name": "饭太硬5"
-        },
-        {
-            "url": "https://tv.菜妮丝.top",
-            "name": "杰翔"
-        },
-        {
-            "url": "http://肥猫.net/tv",
-            "name": "肥猫5"
         },
         {
             "url": "https://盒子迷.top/禁止贩卖",
@@ -32,6 +24,10 @@
         {
             "url": "http://www.饭太硬.cc/tv",
             "name": "饭太硬1"
+        },
+        {
+            "url": "http://肥猫.net/tv",
+            "name": "肥猫5"
         },
         {
             "url": "http://www.饭太硬.art/tv",
@@ -46,12 +42,16 @@
             "name": "驸马"
         },
         {
-            "url": "http://tvbox.王二小放牛娃.top",
-            "name": "王二小"
+            "url": "https://tv.菜妮丝.top",
+            "name": "杰翔"
         },
         {
             "url": "http://www.饭太硬.net/tv",
             "name": "饭太硬2"
+        },
+        {
+            "url": "http://tvbox.王二小放牛娃.top",
+            "name": "王二小"
         }
     ],
     "backup_urls": [
