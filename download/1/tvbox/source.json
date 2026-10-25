@@ -6,6 +6,10 @@
             "name": "杰翔"
         },
         {
+            "url": "http://fty.333232.xyz/tv",
+            "name": "饭太硬6"
+        },
+        {
             "url": "https://9280.kstore.vip/wex.json",
             "name": "牛二"
         },
@@ -14,16 +18,8 @@
             "name": "盒子迷"
         },
         {
-            "url": "http://fty.333232.xyz/tv",
-            "name": "饭太硬6"
-        },
-        {
             "url": "http://www.饭太硬.net/tv",
             "name": "饭太硬2"
-        },
-        {
-            "url": "http://fty.888484.xyz/tv",
-            "name": "饭太硬5"
         },
         {
             "url": "http://www.饭太硬.art/tv",
@@ -34,12 +30,16 @@
             "name": "饭太硬1"
         },
         {
-            "url": "http://肥猫.net/tv",
-            "name": "肥猫5"
+            "url": "http://fty.888484.xyz/tv",
+            "name": "饭太硬5"
         },
         {
             "url": "http://肥猫.net/",
             "name": "肥猫影视"
+        },
+        {
+            "url": "http://肥猫.net/tv",
+            "name": "肥猫5"
         }
     ],
     "backup_urls": [
