@@ -10,20 +10,12 @@
             "name": "牛二"
         },
         {
-            "url": "http://www.饭太硬.cc/tv",
-            "name": "饭太硬1"
-        },
-        {
-            "url": "http://tvbox.王二小放牛娃.top",
-            "name": "王二小"
-        },
-        {
             "url": "http://fty.888484.xyz/tv",
             "name": "饭太硬5"
         },
         {
-            "url": "http://www.饭太硬.art/tv",
-            "name": "饭太硬3"
+            "url": "http://www.饭太硬.cc/tv",
+            "name": "饭太硬1"
         },
         {
             "url": "https://盒子迷.top/禁止贩卖",
@@ -34,19 +26,27 @@
             "name": "饭太硬6"
         },
         {
-            "url": "http://肥猫.net/tv",
-            "name": "肥猫5"
-        },
-        {
             "url": "http://www.饭太硬.net/tv",
             "name": "饭太硬2"
         },
         {
+            "url": "http://hello.肥猫.net",
+            "name": "肥猫4"
+        },
+        {
             "url": "http://肥猫.net/",
             "name": "肥猫影视"
+        },
+        {
+            "url": "https://gitee.com/yygitee118/hd-source/raw/main/config.gitee.json",
+            "name": "高清源(Gitee)"
         }
     ],
     "backup_urls": [
+        {
+            "url": "http://tvbox.王二小放牛娃.top",
+            "name": "王二小"
+        },
         {
             "url": "http://feimao.pro",
             "name": "肥猫2"
@@ -60,6 +60,10 @@
             "name": "寳盒"
         },
         {
+            "url": "http://www.饭太硬.art/tv",
+            "name": "饭太硬3"
+        },
+        {
             "url": "http://fty.xxooo.cf/tv",
             "name": "饭太硬4"
         },
@@ -68,12 +72,16 @@
             "name": "饭太硬江苏郑州"
         },
         {
-            "url": "http://hello.肥猫.net",
-            "name": "肥猫4"
+            "url": "http://肥猫.net/tv",
+            "name": "肥猫5"
         },
         {
             "url": "http://fmys.top/fmys.json",
             "name": "驸马"
+        },
+        {
+            "url": "https://cdn.jsdelivr.net/gh/haonanren118/hd-source@main/config.jsdelivr.json",
+            "name": "高清源"
         }
     ]
 }
