@@ -227,7 +227,6 @@ def check_all_sources(sources, china_speed_map=None):
 
     # 合并结果：优先用国内测速延迟排序，否则用本地响应耗时
     alive_with_hash = []
-    dead = []
     dropped = []
     for i in sorted(results.keys()):
         item, ok, status, ms, content_hash = results[i]
@@ -235,14 +234,12 @@ def check_all_sources(sources, china_speed_map=None):
             china_ms = china_speed_map.get(item["name"]) if china_speed_map else None
             rank_ms = china_ms if china_ms is not None else ms
             alive_with_hash.append((item, rank_ms, content_hash, china_ms))
-        elif status == "invalid_content":
-            # 内容校验失败 = 确定的伪源（HTML/图片/广告），彻底剔除，不进 backup
-            dropped.append(item["name"])
         else:
-            # 超时/HTTP错误 = 临时故障，保留在 backup 供下次重建尝试
-            dead.append((item, status))
+            # 所有失败源（内容伪源 + 网络故障）一律剔除，不写入配置
+            reason = "invalid content" if status == "invalid_content" else "network error: " + str(status)
+            dropped.append("{} ({})".format(item["name"], reason))
     if dropped:
-        log("Dropped {} invalid-content sources entirely: {}".format(
+        log("Dropped {} failed sources entirely: {}".format(
             len(dropped), ", ".join(dropped)))
 
     # 按内容哈希去重：同源镜像只保留延迟最低者
@@ -253,26 +250,24 @@ def check_all_sources(sources, china_speed_map=None):
             best_by_hash[h] = entry
 
     alive = sorted(best_by_hash.values(), key=lambda x: x[1])
-    log("Result: {} alive (after content-hash dedup), {} backup".format(len(alive), len(dead)))
+    log("Result: {} alive (after content-hash dedup), {} dropped".format(len(alive), len(dropped)))
     for rank, (item, rank_ms, h, china_ms) in enumerate(alive, 1):
         label = "{}ms(CN)".format(china_ms) if china_ms is not None else "{}ms(local)".format(rank_ms)
         log("  #{} {} -> {} [hash={}]".format(rank, item["name"], label, h[:8]))
-    return [x[0] for x in alive], dead
+    return [x[0] for x in alive]
 
 
-def generate_json(alive_sources, dead_sources):
+def generate_json(alive_sources):
     config = {
         "notice": NOTICE_TEXT,
         "urls": alive_sources,
     }
-    if dead_sources:
-        config["backup_urls"] = [x[0] for x in dead_sources]
     out_dir = "download/1/tvbox"
     os.makedirs(out_dir, exist_ok=True)
     fname = os.path.join(out_dir, "source.json")
     with open(fname, "w", encoding="utf-8") as f:
         json.dump(config, f, ensure_ascii=False, indent=4)
-    log("Generated: {} ({} alive, {} backup)".format(fname, len(alive_sources), len(dead_sources)))
+    log("Generated: {} ({} alive)".format(fname, len(alive_sources)))
     return fname
 
 
@@ -289,9 +284,9 @@ if __name__ == "__main__":
         log("China speed test done: {}/{} sources got CN latency".format(
             len(china_speed_map), len(all_sources)))
 
-        # 阶段2：HTTP 连通性检测 + 排序
-        alive_sources, dead_sources = check_all_sources(all_sources, china_speed_map)
-        fname = generate_json(alive_sources, dead_sources)
+        # 阶段2：内容校验 + 排序 + 去重
+        alive_sources = check_all_sources(all_sources, china_speed_map)
+        fname = generate_json(alive_sources)
         with open(fname, "r", encoding="utf-8") as f:
             data = json.load(f)
         log("JSON verified OK: {} entries, notice {} chars".format(
