@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+import hashlib
 import time
 import concurrent.futures
 from urllib.request import urlopen, Request
@@ -49,22 +50,28 @@ CANDIDATE_SOURCES = [
 TIMEOUT = 8
 MAX_WORKERS = 10
 CUSTOM_SOURCES_FILE = "custom_sources.json"
-CHINA_SPEED_API = "https://v2.xxapi.cn/api/speed"  # 国内测速 API
+# 国内测速 API：pingtest.cn 免密钥，返回 result.ttfbMs（首字节毫秒）
+CHINA_SPEED_API = "https://www.pingtest.cn/api/http/"  # 国内测速 API
+# 有效配置必须包含的字段之一（TVBox 配置特征）
+VALID_CONFIG_KEYS = ("sites", "lives", "urls")
 # ============================================================
 
 
 def check_speed_china(url):
-    """通过国内 API 检测 URL 的国内访问延迟，返回毫秒数，失败返回 None"""
+    """通过 pingtest.cn 检测 URL 的国内访问延迟（首字节时间），返回毫秒数，失败返回 None"""
     try:
-        api_url = CHINA_SPEED_API + "?url=" + quote(url, safe=":/")
+        ascii_url = url_to_ascii(url)
+        api_url = CHINA_SPEED_API + "?url=" + quote(ascii_url, safe="")
         req = Request(api_url, method="GET")
-        req.add_header("User-Agent", "Mozilla/5.0")
+        req.add_header("User-Agent", "okhttp/3.14.9")
         resp = urlopen(req, timeout=TIMEOUT * 2)
         data = json.loads(resp.read().decode("utf-8"))
         resp.close()
-        if data.get("code") == 200 and data.get("data"):
-            ms_str = str(data["data"]).replace("ms", "").strip()
-            return int(ms_str)
+        # pingtest.cn: {"ok": true, "result": {"ttfbMs": 158.3, ...}}
+        if data.get("ok") and isinstance(data.get("result"), dict):
+            ttfb = data["result"].get("ttfbMs")
+            if ttfb is not None:
+                return int(float(ttfb))
     except Exception as e:
         log("  [CHINA_API_ERR] {} -> {}".format(url[:50], str(e)))
     return None
@@ -127,13 +134,27 @@ def url_to_ascii(url):
         return url
 
 
-def check_url_alive(item):
-    """HTTP 连通性检测：HTTP < 400 + 非空响应 = 存活。
+def config_content_hash(data):
+    """校验响应体是否为有效 TVBox 配置，有效则返回内容 MD5，否则返回 None。
 
-    不做内容格式验证，原因：
-    1. GitHub Actions 美国节点访问国内 CDN 时经常返回 HTML 劫持页（区域限制）
-    2. 国内 CDN 常用 text/html Content-Type 返回 JSON/base64 配置
-    3. TVBox 客户端会自动跳过无法解析的源，无需在这里做严格过滤
+    有效标准：能 json.loads 为 dict，且含 sites/lives/urls 之一。
+    返回内容哈希用于后续同源镜像去重。
+    """
+    try:
+        obj = json.loads(data.decode("utf-8", "replace"))
+        if not isinstance(obj, dict):
+            return None
+        if not any(k in obj for k in VALID_CONFIG_KEYS):
+            return None
+        return hashlib.md5(data).hexdigest()
+    except Exception:
+        return None
+
+
+def check_url_alive(item):
+    """HTTP 内容校验：响应必须是有效 TVBox 配置（JSON + 关键字段）才算存活。
+
+    同时返回响应内容哈希，用于同源镜像去重。
     """
     url = item["url"]
     name = item["name"]
@@ -142,101 +163,100 @@ def check_url_alive(item):
 
     try:
         get_req = Request(ascii_url, method="GET")
-        get_req.add_header("User-Agent", "Mozilla/5.0")
+        # 用 TVBox 客户端真实 UA：部分国内源（如杰翔/王二小）对浏览器 UA 返回防抓页，
+        # 仅对 okhttp UA 返回有效配置 JSON。用浏览器 UA 会误杀可用源。
+        get_req.add_header("User-Agent", "okhttp/3.14.9")
         resp = urlopen(get_req, timeout=TIMEOUT)
         status = resp.status
         data = resp.read()
         resp.close()
 
         ms = int((time.time() - t0) * 1000)
+        content_hash = config_content_hash(data)
 
-        if len(data) > 0:
-            log("  [OK] [{}] {} -> {} ({}ms, {}bytes)".format(status, name, repr(url), ms, len(data)))
-            return item, True, str(status), ms
+        if content_hash is not None:
+            log("  [OK] [{}] {} -> {} ({}ms, {}bytes, hash={})".format(
+                status, name, repr(url), ms, len(data), content_hash[:8]))
+            return item, True, str(status), ms, content_hash
         else:
-            log("  [WARN] [{}] {} -> {} ({}ms, empty)".format(status, name, repr(url), ms))
-            return item, False, "empty_response", ms
+            # 返回 200 但内容为 HTML/图片/广告/空 —— 伪源，判死
+            head = data[:60].decode("utf-8", "replace").replace("\n", " ").replace("\r", " ")
+            log("  [INVALID] [{}] {} -> {} ({}ms, {}bytes, not valid config: {})".format(
+                status, name, repr(url), ms, len(data), repr(head)))
+            return item, False, "invalid_content", ms, None
     except Exception as e:
         ms = int((time.time() - t0) * 1000)
         err = type(e).__name__
         log("  [FAIL] [{}] {} -> {} ({}ms)".format(err, name, repr(url), ms))
-        return item, False, err, ms
+        return item, False, err, ms, None
 
 
 def check_all_sources(sources, china_speed_map=None):
-    """检测所有线路的可用性。
+    """检测所有线路的内容有效性。
 
-    策略：
-    - 国内测速成功的线路 -> 直接视为存活（国内能用就是能用）
-    - 国内测速失败的线路 -> 走 HTTP 连通性检测（超时/DNS失败/HTTP错误 = 死亡）
-    - 只有 HTTP 请求异常的才放入 backup_urls
+    策略（修复后）：
+    - 所有线路（含国内测速成功的）都必须经过内容校验，伪源（HTML/图片/广告）一律判死
+    - 国内测速结果仅用于排序加权，不再直接决定存活
+    - 存活线路按响应内容 MD5 去重，同源镜像只保留延迟最低者
     """
-    # 国内测速成功的直接存活
-    need_us_check = []
-    alive_from_china = []
+    log("Phase 2: content validation for {} sources...".format(len(sources)))
 
-    for i, item in enumerate(sources):
-        name = item["name"]
-        china_ms = china_speed_map.get(name) if china_speed_map else None
-        if china_ms is not None:
-            alive_from_china.append((i, item, china_ms))
-            log("  [CN_ALIVE] {} -> {}ms (skipped US check)".format(name, china_ms))
-        else:
-            need_us_check.append((i, item))
-
-    log("Phase 2: HTTP connectivity check for {} sources ({} already alive from CN)...".format(
-        len(need_us_check), len(alive_from_china)))
-
-    # 对国内测速失败的线路做 HTTP 连通性检测
     results = {}
-    if need_us_check:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            future_map = {}
-            for idx, (i, item) in enumerate(need_us_check):
-                future_map[executor.submit(check_url_alive, item)] = i
-            done, not_done = concurrent.futures.wait(
-                future_map.keys(), timeout=TIMEOUT * 3,
-                return_when=concurrent.futures.ALL_COMPLETED)
-            for future in done:
-                try:
-                    item_result = future.result(timeout=1)
-                    results[future_map[future]] = item_result
-                except concurrent.futures.TimeoutError:
-                    i = future_map[future]
-                    item = sources[i]
-                    log("  [RESULT_TIMEOUT] {} -> getting result timed out".format(item["name"]))
-                    results[i] = (item, False, "ResultTimeout", 99999)
-                except Exception as e:
-                    i = future_map[future]
-                    item = sources[i]
-                    log("  [FUTURE_ERR] {} -> {}".format(item["name"], str(e)))
-                    results[i] = (item, False, "FutureError", 99999)
-            for future in not_done:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        future_map = {}
+        for i, item in enumerate(sources):
+            future_map[executor.submit(check_url_alive, item)] = i
+        done, not_done = concurrent.futures.wait(
+            future_map.keys(), timeout=TIMEOUT * 3,
+            return_when=concurrent.futures.ALL_COMPLETED)
+        for future in done:
+            try:
+                results[future_map[future]] = future.result(timeout=1)
+            except concurrent.futures.TimeoutError:
                 i = future_map[future]
-                item = sources[i]
-                log("  [TIMEOUT] {} -> {}".format(item["name"], repr(item["url"])))
-                results[i] = (item, False, "Timeout", 99999)
+                log("  [RESULT_TIMEOUT] {} -> getting result timed out".format(sources[i]["name"]))
+                results[i] = (sources[i], False, "ResultTimeout", 99999, None)
+            except Exception as e:
+                i = future_map[future]
+                log("  [FUTURE_ERR] {} -> {}".format(sources[i]["name"], str(e)))
+                results[i] = (sources[i], False, "FutureError", 99999, None)
+        for future in not_done:
+            i = future_map[future]
+            log("  [TIMEOUT] {} -> {}".format(sources[i]["name"], repr(sources[i]["url"])))
+            results[i] = (sources[i], False, "Timeout", 99999, None)
 
-    # 合并结果
-    alive = []
+    # 合并结果：优先用国内测速延迟排序，否则用本地响应耗时
+    alive_with_hash = []
     dead = []
-    for i, item, china_ms in alive_from_china:
-        alive.append((item, china_ms))
+    dropped = []
     for i in sorted(results.keys()):
-        item_result = results[i]
-        item = item_result[0]
-        if item_result[1]:
-            alive.append((item, item_result[3]))
+        item, ok, status, ms, content_hash = results[i]
+        if ok:
+            china_ms = china_speed_map.get(item["name"]) if china_speed_map else None
+            rank_ms = china_ms if china_ms is not None else ms
+            alive_with_hash.append((item, rank_ms, content_hash, china_ms))
+        elif status == "invalid_content":
+            # 内容校验失败 = 确定的伪源（HTML/图片/广告），彻底剔除，不进 backup
+            dropped.append(item["name"])
         else:
-            dead.append((item, item_result[2]))
+            # 超时/HTTP错误 = 临时故障，保留在 backup 供下次重建尝试
+            dead.append((item, status))
+    if dropped:
+        log("Dropped {} invalid-content sources entirely: {}".format(
+            len(dropped), ", ".join(dropped)))
 
-    # 按延迟排序
-    alive.sort(key=lambda x: x[1])
-    log("Result: {} alive (sorted by speed), {} backup".format(len(alive), len(dead)))
-    for rank, (item, ms) in enumerate(alive, 1):
-        china_ms = china_speed_map.get(item["name"]) if china_speed_map else None
-        label = "{}ms(CN)".format(china_ms) if china_ms else "{}ms(US-fallback)".format(ms)
-        log("  #{} {} -> {}".format(rank, item["name"], label))
+    # 按内容哈希去重：同源镜像只保留延迟最低者
+    best_by_hash = {}
+    for entry in alive_with_hash:
+        h = entry[2]
+        if h not in best_by_hash or entry[1] < best_by_hash[h][1]:
+            best_by_hash[h] = entry
+
+    alive = sorted(best_by_hash.values(), key=lambda x: x[1])
+    log("Result: {} alive (after content-hash dedup), {} backup".format(len(alive), len(dead)))
+    for rank, (item, rank_ms, h, china_ms) in enumerate(alive, 1):
+        label = "{}ms(CN)".format(china_ms) if china_ms is not None else "{}ms(local)".format(rank_ms)
+        log("  #{} {} -> {} [hash={}]".format(rank, item["name"], label, h[:8]))
     return [x[0] for x in alive], dead
 
 
