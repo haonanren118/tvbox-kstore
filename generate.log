@@ -45771,3 +45771,61 @@ Generated: download/1/tvbox/source.json (4 alive)
 JSON verified OK: 4 entries, notice 104 chars
 Done in 33.1s
 === END ===
+=== generate.py START ===
+Timestamp: 2026-11-18 00:10:41
+Python 3.11
+Loaded 7 custom sources from custom_sources.json
+Total sources: 20 (built-in: 13, custom: 7)
+Phase 1: China speed test for 20 sources...
+  [CHINA] 杰翔 -> 476ms
+  [CHINA] 王二小 -> 10023ms
+  [CHINA] 肥猫2 -> N/A (API failed, will use fallback)
+  [CHINA] 肥猫3 -> 330ms
+  [CHINA] 盒子迷 -> 284ms
+  [CHINA] 寳盒 -> 259ms
+  [CHINA] 饭太硬1 -> 23ms
+  [CHINA] 饭太硬2 -> 24ms
+  [CHINA] 饭太硬3 -> 140ms
+  [CHINA] 饭太硬4 -> N/A (API failed, will use fallback)
+  [CHINA] 饭太硬5 -> 35ms
+  [CHINA] 饭太硬6 -> 398ms
+  [CHINA] 饭太硬江苏郑州 -> 308ms
+  [CHINA] 肥猫影视 -> 795ms
+  [CHINA] 肥猫4 -> 756ms
+  [CHINA] 肥猫5 -> 826ms
+  [CHINA] 牛二 -> 319ms
+  [CHINA] 驸马 -> 90ms
+  [CHINA] 高清源 -> 49ms
+  [CHINA] 高清源(Gitee) -> 366ms
+China speed test done: 18/20 sources got CN latency
+Phase 2: content validation for 20 sources...
+  [FAIL] [HTTPError] 寳盒 -> 'https://gh-proxy.com/https://raw.githubusercontent.com/guot55/yg/main/pg/bh.json' (229ms)
+  [FAIL] [URLError] 肥猫2 -> 'http://feimao.pro' (262ms)
+  [OK] [200] 杰翔 -> 'https://tv.菜妮丝.top' (272ms, 16013bytes, hash=02fbe463)
+  [FAIL] [URLError] 饭太硬4 -> 'http://fty.xxooo.cf/tv' (369ms)
+  [FAIL] [HTTPError] 肥猫3 -> 'https://6296.kstore.vip/fm.gif' (387ms)
+  [INVALID] [200] 饭太硬1 -> 'http://www.饭太硬.cc/tv' (536ms, 18715bytes, not valid config: '����\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00��\x00�\x00\x06\x06\x06\x06\x06\x06\x06\x07\x07\x06\t \t \t \x0c\x0b\x0b\x0c \x14\x0e\x0f\x0e\x0f\x0e\x14\x1f\x13\x16\x13\x13\x16\x13')
+  [OK] [200] 盒子迷 -> 'https://盒子迷.top/禁止贩卖' (555ms, 13291bytes, hash=ea4625ca)
+  [INVALID] [200] 饭太硬5 -> 'http://fty.888484.xyz/tv' (399ms, 18715bytes, not valid config: '����\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00��\x00�\x00\x06\x06\x06\x06\x06\x06\x06\x07\x07\x06\t \t \t \x0c\x0b\x0b\x0c \x14\x0e\x0f\x0e\x0f\x0e\x14\x1f\x13\x16\x13\x13\x16\x13')
+  [INVALID] [200] 饭太硬2 -> 'http://www.饭太硬.net/tv' (740ms, 18715bytes, not valid config: '����\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00��\x00�\x00\x06\x06\x06\x06\x06\x06\x06\x07\x07\x06\t \t \t \x0c\x0b\x0b\x0c \x14\x0e\x0f\x0e\x0f\x0e\x14\x1f\x13\x16\x13\x13\x16\x13')
+  [INVALID] [200] 饭太硬6 -> 'http://fty.333232.xyz/tv' (661ms, 18715bytes, not valid config: '����\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00��\x00�\x00\x06\x06\x06\x06\x06\x06\x06\x07\x07\x06\t \t \t \x0c\x0b\x0b\x0c \x14\x0e\x0f\x0e\x0f\x0e\x14\x1f\x13\x16\x13\x13\x16\x13')
+  [OK] [200] 牛二 -> 'https://9280.kstore.vip/wex.json' (441ms, 34815bytes, hash=3b8673e0)
+  [INVALID] [200] 饭太硬3 -> 'http://www.饭太硬.art/tv' (1001ms, 18715bytes, not valid config: '����\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00��\x00�\x00\x06\x06\x06\x06\x06\x06\x06\x07\x07\x06\t \t \t \x0c\x0b\x0b\x0c \x14\x0e\x0f\x0e\x0f\x0e\x14\x1f\x13\x16\x13\x13\x16\x13')
+  [FAIL] [HTTPError] 高清源 -> 'https://cdn.jsdelivr.net/gh/haonanren118/hd-source@main/config.jsdelivr.json' (410ms)
+  [FAIL] [HTTPError] 驸马 -> 'http://fmys.top/fmys.json' (656ms)
+  [FAIL] [HTTPError] 饭太硬江苏郑州 -> 'https://raw.atomgit.com/xxxooo/fan/blobs/cef5f441c422cffe4852e0fc8b102f9be6d2bb2b/in.bmp' (1352ms)
+  [INVALID] [200] 肥猫影视 -> 'http://肥猫.net/' (3170ms, 25244bytes, not valid config: '2423376430777775336772626a363823241af48d81469970e1c9451a7877')
+  [OK] [200] 高清源(Gitee) -> 'https://gitee.com/yygitee118/hd-source/raw/main/config.gitee.json' (4022ms, 15962bytes, hash=834404cc)
+  [FAIL] [HTTPError] 肥猫5 -> 'http://肥猫.net/tv' (5766ms)
+  [FAIL] [TimeoutError] 王二小 -> 'http://tvbox.王二小放牛娃.top' (8320ms)
+  [FAIL] [TimeoutError] 肥猫4 -> 'http://hello.肥猫.net' (8380ms)
+Dropped 16 failed sources entirely: 王二小 (network error: TimeoutError), 肥猫2 (network error: URLError), 肥猫3 (network error: HTTPError), 寳盒 (network error: HTTPError), 饭太硬1 (invalid content), 饭太硬2 (invalid content), 饭太硬3 (invalid content), 饭太硬4 (network error: URLError), 饭太硬5 (invalid content), 饭太硬6 (invalid content), 饭太硬江苏郑州 (network error: HTTPError), 肥猫影视 (invalid content), 肥猫4 (network error: TimeoutError), 肥猫5 (network error: HTTPError), 驸马 (network error: HTTPError), 高清源 (network error: HTTPError)
+Result: 4 alive (after content-hash dedup), 16 dropped
+  #1 盒子迷 -> 284ms(CN) [hash=ea4625ca]
+  #2 牛二 -> 319ms(CN) [hash=3b8673e0]
+  #3 高清源(Gitee) -> 366ms(CN) [hash=834404cc]
+  #4 杰翔 -> 476ms(CN) [hash=02fbe463]
+Generated: download/1/tvbox/source.json (4 alive)
+JSON verified OK: 4 entries, notice 104 chars
+Done in 44.1s
+=== END ===
