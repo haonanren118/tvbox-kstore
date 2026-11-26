@@ -2,16 +2,16 @@
     "notice": "阁下好手段！本资源均来源于网络公开收集整理，仅供个人学习交流使用，严禁私自售卖、二次倒卖及商用，下载后请 24 小时内自行删除，使用产生一切后果均由使用者自行承担，与本人无关，特此警示！如有冒犯，请联系删除。",
     "urls": [
         {
-            "url": "https://9280.kstore.vip/wex.json",
-            "name": "牛二"
-        },
-        {
             "url": "https://gitee.com/yygitee118/hd-source/raw/main/config.gitee.json",
             "name": "高清源(Gitee)"
         },
         {
             "url": "https://盒子迷.top/禁止贩卖",
             "name": "盒子迷"
+        },
+        {
+            "url": "https://9280.kstore.vip/wex.json",
+            "name": "牛二"
         },
         {
             "url": "https://tv.菜妮丝.top",
